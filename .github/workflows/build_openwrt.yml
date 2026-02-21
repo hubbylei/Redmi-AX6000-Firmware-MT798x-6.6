@@ -39,7 +39,7 @@ jobs:
           cp -f ${GITHUB_WORKSPACE}/$CONFIG_FILE ${GITHUB_WORKSPACE}/openwrt/.config
           make defconfig
       - name: Download package
-        run: make download -j8
+        run: cd ${GITHUB_WORKSPACE}/openwrt && make download -j8
       - name: Compile the firmware
         id: compile
         run: |

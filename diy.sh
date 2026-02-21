@@ -3,7 +3,7 @@ rm -rf feeds/packages/lang/golang
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/sbwml/packages_lang_golang -b 26.x feeds/packages/lang/golang
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/pymumu/openwrt-smartdns -b master package/custom/smartdns
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/pymumu/luci-app-smartdns -b master package/custom/luci-app-smartdns
-git clone --filter=blob:none --depth 1 --single-branch https://github.com/Openwrt-Passwall/openwrt-passwall -b main package/custom/luci-app-passwall
+git clone --filter=blob:none --depth 1 --single-branch https://github.com/Openwrt-Passwall/openwrt-passwall -b main package/custom/openwrt-passwall
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/Openwrt-Passwall/openwrt-passwall-packages -b main package/custom/passwall-packages
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/tty228/luci-app-wechatpush -b master package/custom/luci-app-wechatpush
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbylei/wrtbwmon -b master package/custom/wrtbwmon
