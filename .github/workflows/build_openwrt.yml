@@ -86,7 +86,7 @@ jobs:
           bodyFile: release.txt
           artifacts: ${{ env.FIRMWARE }}/*
       - name: Remove old Releases
-        if: !cancelled()
+        if: (!cancelled())
         uses: dev-drprasad/delete-older-releases@master
         with:
           keep_latest: 12
