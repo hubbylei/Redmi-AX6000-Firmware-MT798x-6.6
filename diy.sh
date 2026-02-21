@@ -10,6 +10,7 @@ git clone --filter=blob:none --depth 1 --single-branch https://github.com/tty228
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbylei/wrtbwmon -b master package/custom/wrtbwmon
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbylei/openwrt-cdnspeedtest -b master package/custom/openwrt-cdnspeedtest
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbylei/luci-app-cloudflarespeedtest -b main package/custom/luci-app-cloudflarespeedtest
+git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbylei/luci-theme-bootstrap-mod -b main package/custom/luci-theme-bootstrap-mod
 
 cp -rf package/custom/openwrt-passwall/luci-app-passwall package/custom/
 rm -rf package/custom/passwall-packages/.git*
