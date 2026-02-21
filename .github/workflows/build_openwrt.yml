@@ -18,15 +18,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@main
+
       - name: Clean-up
         uses: rokibhasansagar/slimhub_actions@main
+
       - name: Initialization environment
         run: |
           sudo -E apt-get -qq update
           sudo -E apt-get -qq install $(cat ${GITHUB_WORKSPACE}/depends-ubuntu)
           sudo timedatectl set-timezone "$TZ"
+
       - name: Clone source code
         run: git clone $REPO_URL -b $REPO_BRANCH ${GITHUB_WORKSPACE}/openwrt
+
       - name: Load custom configure
         run: |
           cp -vf ${GITHUB_WORKSPACE}/$DIY_SH ${GITHUB_WORKSPACE}/openwrt/
@@ -38,8 +42,10 @@ jobs:
           ./scripts/feeds install -a
           cp -f ${GITHUB_WORKSPACE}/$CONFIG_FILE ${GITHUB_WORKSPACE}/openwrt/.config
           make defconfig
+
       - name: Download package
         run: cd ${GITHUB_WORKSPACE}/openwrt && make download -j8
+
       - name: Compile firmware
         id: compile
         run: |
@@ -51,6 +57,7 @@ jobs:
             echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
             echo "BUILD_DATE=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
           fi
+
       - name: Organize files
         id: organize
         if: steps.compile.outputs.status == 'success' && !cancelled()
@@ -62,12 +69,14 @@ jobs:
           mv ${GITHUB_WORKSPACE}/openwrt/OpenWrt_bin${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}.zip ./
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
           echo "status=success" >> $GITHUB_OUTPUT
+
       - name: Upload artifact
         if: steps.organize.outputs.status == 'success' && !cancelled()
         uses: actions/upload-artifact@main
         with:
           name: ${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}__firmware
           path: ${{ env.FIRMWARE }}
+
       - name: Generate release info
         id: info
         run: |
@@ -79,6 +88,7 @@ jobs:
           echo "**:minidisc: Build Time: ${release_tag}**" >> release.txt
           touch release.txt
           echo "status=success" >> $GITHUB_OUTPUT
+
       - name: Upload firmware to release
         if: steps.info.outputs.status == 'success' && !cancelled()
         uses: ncipollo/release-action@main
@@ -86,6 +96,7 @@ jobs:
           tag: ${{ steps.info.outputs.release_tag }}
           bodyFile: release.txt
           artifacts: ${{ env.FIRMWARE }}/*
+
       - name: Remove old Releases
         if: (!cancelled())
         uses: dev-drprasad/delete-older-releases@master
@@ -94,6 +105,7 @@ jobs:
           delete_tags: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@main
         with:
