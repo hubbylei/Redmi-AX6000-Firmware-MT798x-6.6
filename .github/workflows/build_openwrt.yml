@@ -63,10 +63,10 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           cd ${GITHUB_WORKSPACE}/openwrt/bin
-          zip -r ${GITHUB_WORKSPACE}/openwrt/Bin_Package_${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}.zip *
+          zip -r ${GITHUB_WORKSPACE}/openwrt/${{ env.DEVICE_NAME }}_bin_${{ env.BUILD_DATE }}.zip *
           cd ${GITHUB_WORKSPACE}/openwrt/bin/targets/*/*
           rm -rf packages
-          mv ${GITHUB_WORKSPACE}/openwrt/Bin_Package_${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}.zip ./
+          mv ${GITHUB_WORKSPACE}/openwrt/${{ env.DEVICE_NAME }}_bin_${{ env.BUILD_DATE }}.zip ./
           echo "FIRMWARE=$PWD" >> $GITHUB_ENV
           echo "status=success" >> $GITHUB_OUTPUT
 
@@ -74,7 +74,7 @@ jobs:
         if: steps.organize.outputs.status == 'success' && !cancelled()
         uses: actions/upload-artifact@main
         with:
-          name: ${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}__firmware
+          name: ${{ env.DEVICE_NAME }}_bin_${{ env.BUILD_DATE }}
           path: ${{ env.FIRMWARE }}
 
       - name: Generate release info
