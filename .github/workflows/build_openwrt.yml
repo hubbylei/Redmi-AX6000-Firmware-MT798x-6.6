@@ -5,10 +5,11 @@ on:
     - cron: 0 0 1 * *
 
 env: 
-  REPO_URL:
-  REPO_BRANCH:
-  CONFIG_FILE:
-  DIY_SH:
+  REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
+  REPO_BRANCH: openwrt-24.10-6.6
+  CONFIG_FILE: ax6000.conf
+  DIY_SH: diy.sh
+  AUTH: ${{ secrets.AUTH }}
   TZ: Asia/Shanghai
 
 jobs:
