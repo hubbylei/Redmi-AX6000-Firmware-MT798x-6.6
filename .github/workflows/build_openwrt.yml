@@ -1,0 +1,100 @@
+name: Build Firmware
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 1 * *
+
+env: 
+  REPO_URL:
+  REPO_BRANCH:
+  CONFIG_FILE:
+  DIY_SH:
+  TZ: Asia/Shanghai
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@man
+      - name: Clean-up
+        uses: rokibhasansagar/slimhub_actions@main
+      - name: Initialization environment
+        run: |
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(cat ${GITHUB_WORKSPACE}/depends-ubuntu)
+          sudo timedatectl set-timezone "$TZ"
+      - name: Clone source code
+        run: git clone $REPO_URL -b $REPO_BRANCH ${GITHUB_WORKSPACE}/openwrt
+      - name: Load custom configure
+        run: |
+          cp -vf ${GITHUB_WORKSPACE}/$DIY_SH ${GITHUB_WORKSPACE}/openwrt/
+          cd ${GITHUB_WORKSPACE}/openwrt
+          chmod a+x $DIY_SH
+          ./scripts/feeds update -a
+          ./$DIY_SH
+          ./scripts/feeds update -i
+          ./scripts/feeds install -a
+          cp -f ${GITHUB_WORKSPACE}/$CONFIG_FILE ${GITHUB_WORKSPACE}/openwrt/.config
+          make defconfig
+      - name: Download package
+        run: make download -j8
+      - name: Compile the firmware
+        id: compile
+        run: |
+          cd ${GITHUB_WORKSPACE}/openwrt
+          echo -e "$(nproc) thread compile"
+          make -j$(nproc)
+          if [ $? -eq 0 ];then
+            echo "status=success" >> "$GITHUB_OUTPUT"
+            echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
+            echo "BUILD_DATE=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+          fi
+      - name: Organize files
+        id: organize
+        if: steps.compile.outputs.status == 'success' && !cancelled()
+        run: |
+          cd ${GITHUB_WORKSPACE}/openwrt/bin
+          zip -r ${GITHUB_WORKSPACE}/openwrt/OpenWrt_bin${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}.zip *
+          cd ${GITHUB_WORKSPACE}/openwrt/bin/targets/*/*
+          rm -rf packages
+          mv ${GITHUB_WORKSPACE}/openwrt/OpenWrt_bin${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}.zip ./
+          echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+          echo "status=success" >> $GITHUB_OUTPUT
+      - name: Upload artifact
+        if: steps.organize.outputs.status == 'success' && !cancelled()
+        uses: actions/upload-artifact@main
+        with:
+          name: ${{ env.DEVICE_NAME }}_${{ env.BUILD_DATE }}__firmware
+          path: ${{ env.FIRMWARE }}
+      - name: Generate release info
+        id: info
+        run: |
+          release_tag=$(date +"%Y.%m.%d-%H%M%S")
+          echo "release_tag=${release_tag}" >> $GITHUB_OUTPUT
+          echo "## :mega:Update content" > release.txt
+          echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${release_tag}/total?style=flat-square)" >> release.txt
+          echo "### Info" >> release.txt
+          echo "**:minidisc: Build Time: ${release_tag}**" >> release.txt
+          touch release.txt
+          echo "status=success" >> $GITHUB_OUTPUT
+      - name: Upload firmware to release
+        if: steps.info.outputs.status == 'success' && !cancelled()
+        uses: ncipollo/release-action@main
+        with:
+          tag: ${{ steps.info.outputs.release_tag }}
+          bodyFile: release.txt
+          artifacts: ${{ env.FIRMWARE }}/*
+      - name: Remove old Releases
+        if: !cancelled()
+        uses: dev-drprasad/delete-older-releases@master
+        with:
+          keep_latest: 12
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 0
+          keep_minimum_runs: 1
