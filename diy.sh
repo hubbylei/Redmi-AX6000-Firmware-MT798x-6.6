@@ -15,8 +15,10 @@ git clone --filter=blob:none --depth 1 --single-branch https://github.com/hubbyl
 cp -rf package/custom/openwrt-passwall/luci-app-passwall package/custom/
 rm -rf package/custom/passwall-packages/.git*
 cp -rf package/custom/passwall-packages/* package/custom/
+cp -rf package/custom/openwrt-cdnspeedtest/cdnspeedtest package/custom/
 rm -rf package/custom/openwrt-passwall
 rm -rf package/custom/passwall-packages
+rm -rf package/custom/openwrt-cdnspeedtest
 
 del_data=$(ls package/custom)
 for data in ${del_data}
