@@ -40,7 +40,7 @@ jobs:
           make defconfig
       - name: Download package
         run: cd ${GITHUB_WORKSPACE}/openwrt && make download -j8
-      - name: Compile the firmware
+      - name: Compile firmware
         id: compile
         run: |
           cd ${GITHUB_WORKSPACE}/openwrt

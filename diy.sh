@@ -1,4 +1,5 @@
 #!/bin/bash
+
 rm -rf feeds/packages/lang/golang
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/sbwml/packages_lang_golang -b 26.x feeds/packages/lang/golang
 git clone --filter=blob:none --depth 1 --single-branch https://github.com/pymumu/openwrt-smartdns -b master package/custom/smartdns
