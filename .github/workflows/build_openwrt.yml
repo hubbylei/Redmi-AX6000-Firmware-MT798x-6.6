@@ -34,7 +34,7 @@ jobs:
       - name: Load custom configure
         run: |
           cp -vf ${GITHUB_WORKSPACE}/$DIY_SH ${GITHUB_WORKSPACE}/openwrt/
-          cat ax6000.mk >> target/linux/mediatek/image/filogic.mk
+          cat ax6000.mk >> ${GITHUB_WORKSPACE}/openwrt/target/linux/mediatek/image/filogic.mk
           cd ${GITHUB_WORKSPACE}/openwrt
           chmod a+x $DIY_SH
           ./scripts/feeds update -a
