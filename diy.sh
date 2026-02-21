@@ -30,19 +30,18 @@ do
     fi
 done
 
-sed -i 's/\.\.\/\.\.\/lang\/rust\/rust-package.mk/$(TOPDIR)\/feeds\/packages\/lang\/rust\/rust-package.mk/g' package/custom/smartdns/Makefile
 sed -i '/sed -r -i/a\\tsed -i "s,#Port 22,Port 22,g" $(1)\/etc\/ssh\/sshd_config\n\tsed -i "s,#ListenAddress 0.0.0.0,ListenAddress 0.0.0.0,g" $(1)\/etc\/ssh\/sshd_config\n\tsed -i "s,#PermitRootLogin prohibit-password,PermitRootLogin yes,g" $(1)\/etc\/ssh\/sshd_config' feeds/packages/net/openssh/Makefile
 sed -i 's/;Listen = 0.0.0.0:1688/Listen = 0.0.0.0:1688/g' feeds/packages/net/vlmcsd/files/vlmcsd.ini
 GEOIP_VER=$(echo -n `curl -sL -H "${AUTH}" https://api.github.com/repos/Loyalsoldier/v2ray-rules-dat/releases/latest | jq -r .tag_name`)
-GEOIP_HASH=$(echo -n `curl -sL -H "${AUTH}" https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/$GEOIP_VER/geoip.dat.sha256sum | awk '{print $1}'`)
+GEOIP_HASH=$(echo -n `curl -sL -H "${AUTH}" https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${GEOIP_VER}/geoip.dat.sha256sum | awk '{print $1}'`)
 GEOSITE_VER=${GEOIP_VER}
-GEOSITE_HASH=$(echo -n `curl -sL -H "${AUTH}" https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/$GEOSITE_VER/geosite.dat.sha256sum | awk '{print $1}'`)
+GEOSITE_HASH=$(echo -n `curl -sL -H "${AUTH}" https://github.com/Loyalsoldier/v2ray-rules-dat/releases/download/${GEOSITE_VER}/geosite.dat.sha256sum | awk '{print $1}'`)
 sed -i '/HASH:=/d' package/custom/v2ray-geodata/Makefile
 sed -i 's/Loyalsoldier\/geoip/Loyalsoldier\/v2ray-rules-dat/g' package/custom/v2ray-geodata/Makefile
-sed -i 's/GEOIP_VER:=.*/GEOIP_VER:='"$GEOIP_VER"'/g' package/custom/v2ray-geodata/Makefile
-sed -i '/FILE:=$(GEOIP_FILE)/a\ HASH:='"$GEOIP_HASH"'' package/custom/v2ray-geodata/Makefile
-sed -i 's/GEOSITE_VER:=.*/GEOSITE_VER:='"$GEOSITE_VER"'/g' package/custom/v2ray-geodata/Makefile
-sed -i '/FILE:=$(GEOSITE_FILE)/a\ HASH:='"$GEOSITE_HASH"'' package/custom/v2ray-geodata/Makefile
+sed -i 's/GEOIP_VER:=.*/GEOIP_VER:='"${GEOIP_VER}"'/g' package/custom/v2ray-geodata/Makefile
+sed -i '/FILE:=$(GEOIP_FILE)/a\ HASH:='"${GEOIP_HASH}"'' package/custom/v2ray-geodata/Makefile
+sed -i 's/GEOSITE_VER:=.*/GEOSITE_VER:='"${GEOSITE_VER}"'/g' package/custom/v2ray-geodata/Makefile
+sed -i '/FILE:=$(GEOSITE_FILE)/a\ HASH:='"${GEOSITE_HASH}"'' package/custom/v2ray-geodata/Makefile
 sed -i 's/URL:=https:\/\/www.v2fly.org/URL:=https:\/\/github.com\/Loyalsoldier\/v2ray-rules-dat/g' package/custom/v2ray-geodata/Makefile
 
 SMARTDNS_VER=$(echo -n `curl -sL -H "${AUTH}" https://api.github.com/repos/pymumu/smartdns/commits | jq .[0].commit.committer.date | awk -F "T" '{print $1}' | sed 's/\"//g' | sed 's/\-/\./g'`)
