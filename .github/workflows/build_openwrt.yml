@@ -2,7 +2,7 @@ name: Build Firmware
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 0 1 * *
+    - cron: 0 0 * * 1
 
 env: 
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
@@ -34,7 +34,7 @@ jobs:
       - name: Load custom configure
         run: |
           cp -vf ${GITHUB_WORKSPACE}/$DIY_SH ${GITHUB_WORKSPACE}/openwrt/
-          cat image.mk >> ${GITHUB_WORKSPACE}/openwrt/target/linux/mediatek/image/filogic.mk
+          cat ${GITHUB_WORKSPACE}/image.mk >> ${GITHUB_WORKSPACE}/openwrt/target/linux/mediatek/image/filogic.mk
           cd ${GITHUB_WORKSPACE}/openwrt
           chmod a+x $DIY_SH
           ./scripts/feeds update -a
@@ -54,9 +54,9 @@ jobs:
           echo -e "$(nproc) thread compile"
           make -j$(nproc)
           if [ $? -eq 0 ];then
-            echo "status=success" >> "$GITHUB_OUTPUT"
             echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
             echo "BUILD_DATE=$(date +"%Y%m%d%H%M%S")" >> $GITHUB_ENV
+            echo "status=success" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Organize files
@@ -82,12 +82,12 @@ jobs:
         id: info
         run: |
           release_tag=$(date +"%Y.%m.%d-%H%M%S")
-          echo "release_tag=${release_tag}" >> $GITHUB_OUTPUT
           echo "## :mega:Update content" > release.txt
           echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${release_tag}/total?style=flat-square)" >> release.txt
           echo "### Info" >> release.txt
           echo "**:minidisc: Build Time: ${release_tag}**" >> release.txt
           touch release.txt
+          echo "release_tag=${release_tag}" >> $GITHUB_OUTPUT
           echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Upload firmware to release
