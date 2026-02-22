@@ -33,8 +33,8 @@ jobs:
         run: |
           git clone $REPO_URL -b $REPO_BRANCH ${GITHUB_WORKSPACE}/openwrt
           cd ${GITHUB_WORKSPACE}/openwrt
-          REV=$(git rev-list --count HEAD)
-          echo "rev=${REV}" >> $GITHUB_OUTPUT
+          VCODE=$(git describe --always)
+          echo "vcode=${VCODE}" >> $GITHUB_OUTPUT
 
       - name: Load custom configure
         run: |
@@ -85,7 +85,7 @@ jobs:
       - name: Generate release info
         id: info
         run: |
-          release_tag=${{ steps.compile.outputs.date }}-r${{ steps.clone.outputs.rev }}
+          release_tag=${{ steps.compile.outputs.date }}-${{ steps.clone.outputs.vcode }}
           echo "## :mega:Update content" > release.txt
           echo "![](https://img.shields.io/github/downloads/${{ github.repository }}/${release_tag}/total?style=flat-square)" >> release.txt
           echo "### Info" >> release.txt
