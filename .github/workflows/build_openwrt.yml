@@ -2,7 +2,7 @@ name: Build Firmware
 on:
   workflow_dispatch:
   schedule:
-    - cron: 0 8 * * 1
+    - cron: 30 8 * * 0
 
 env: 
   REPO_URL: https://github.com/padavanonly/immortalwrt-mt798x-6.6.git
