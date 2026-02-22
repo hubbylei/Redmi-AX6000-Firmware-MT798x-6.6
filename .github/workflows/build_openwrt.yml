@@ -34,7 +34,7 @@ jobs:
           git clone $REPO_URL -b $REPO_BRANCH ${GITHUB_WORKSPACE}/openwrt
           cd ${GITHUB_WORKSPACE}/openwrt
           REV=$(git rev-list --count HEAD)
-          echo "rev=${REV}" >> "$GITHUB_OUTPUT"
+          echo "rev=${REV}" >> $GITHUB_OUTPUT
 
       - name: Load custom configure
         run: |
@@ -58,10 +58,10 @@ jobs:
           cd ${GITHUB_WORKSPACE}/openwrt
           echo "DEVICE_NAME=$(grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/')" >> $GITHUB_ENV
           echo "BUILD_DATE=$(date +"%Y.%m.%d %H-%M-%S")" >> $GITHUB_ENV
-          echo "date=$(date +"%Y.%m.%d")" >> "$GITHUB_OUTPUT
+          echo "date=$(date +"%Y.%m.%d")" >> $GITHUB_OUTPUT
           echo -e "$(nproc) thread compile"
           make -j$(nproc)
-          echo "status=success" >> "$GITHUB_OUTPUT"
+          echo "status=success" >> $GITHUB_OUTPUT
 
       - name: Organize files
         id: organize
