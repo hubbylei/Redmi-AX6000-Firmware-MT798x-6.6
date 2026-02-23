@@ -84,6 +84,7 @@ jobs:
 
       - name: Generate release info
         id: info
+        if: steps.organize.outputs.status == 'success' && !cancelled()
         run: |
           release_tag=${{ steps.compile.outputs.date }}-${{ steps.clone.outputs.vcode }}
           echo "## :mega:Update content" > release.txt
@@ -103,7 +104,7 @@ jobs:
           artifacts: ${{ env.FIRMWARE }}/*
 
       - name: Remove old Releases
-        if: (!cancelled())
+        if: steps.info.outputs.status == 'success' && !cancelled()
         uses: dev-drprasad/delete-older-releases@master
         with:
           keep_latest: 48
